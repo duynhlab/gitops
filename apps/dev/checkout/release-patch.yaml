@@ -8,14 +8,14 @@ spec:
   values:
     replicaCount: 1
     image:
-      tag: sha-89804f9
+      tag: sha-a1f6d12
     env:
       - name: SERVICE_NAME
         value: "checkout"
       - name: PORT
         value: "8080"
       - name: VERSION
-        value: "sha-d3c4b32"
+        value: "sha-a1f6d12"
       - name: ENV
         value: "development"
       - name: LOG_LEVEL
