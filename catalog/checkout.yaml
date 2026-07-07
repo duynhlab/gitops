@@ -1,0 +1,24 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout
+  description: Checkout pricing API (Go) — deployed to dev/uat/prod via Flux
+  annotations:
+    # Kubernetes tab: match workload labels from the mop chart (all 3 envs)
+    backstage.io/kubernetes-label-selector: app.kubernetes.io/name=checkout
+    # Flux tab: match the backstage.io/kubernetes-id label on HelmReleases
+    backstage.io/kubernetes-id: checkout
+    github.com/project-slug: duynhlab/checkout-service
+  links:
+    - url: https://github.com/duynhlab/checkout-service
+      title: Source repository
+    - url: https://github.com/duynhlab/gitops
+      title: GitOps manifests
+  tags:
+    - go
+    - microservice
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: duynhlab-ecommerce

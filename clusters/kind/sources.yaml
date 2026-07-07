@@ -1,0 +1,11 @@
+# Shared Helm chart for all services (same chart the homelab services use).
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: mop-chart-oci
+  namespace: flux-system
+spec:
+  interval: 10m
+  url: oci://ghcr.io/duynhlab/helm-charts/mop
+  ref:
+    semver: ">=0.13.0"
