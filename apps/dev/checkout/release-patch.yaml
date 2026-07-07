@@ -8,7 +8,7 @@ spec:
   values:
     replicaCount: 1
     image:
-      tag: sha-d3c4b32
+      tag: sha-89804f9
     env:
       - name: SERVICE_NAME
         value: "checkout"
