@@ -6,16 +6,16 @@ metadata:
   name: checkout
 spec:
   values:
-    replicaCount: 2
+    replicaCount: 1
     image:
-      tag: sha-d3c4b32
+      tag: "1.29-alpine"
     env:
       - name: SERVICE_NAME
         value: "checkout"
       - name: PORT
         value: "8080"
       - name: VERSION
-        value: "sha-d3c4b32"
+        value: "1.29-alpine"
       - name: ENV
         value: "production"
       - name: LOG_LEVEL
