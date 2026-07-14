@@ -17,23 +17,23 @@ flowchart TD
 
     subgraph repo ["duynhlab/gitops (main)"]
         DevDir["apps/dev/*"]
-        UatDir["apps/uat/*"]
         ProdDir["apps/prod/*"]
     end
 
-    subgraph cluster ["Kubernetes cluster (Kind)"]
-        Flux["Flux\nsource + kustomize + helm controllers"]
+    subgraph devcluster ["Kind cluster: dev"]
+        FluxDev["Flux (dev)"]
         DevNS["ns: checkout-dev"]
-        UatNS["ns: checkout-uat"]
+    end
+    subgraph prodcluster ["Kind cluster: prod"]
+        FluxProd["Flux (prod)"]
         ProdNS["ns: checkout-prod"]
     end
 
     CI -->|"direct commit\n(bump image tag)"| DevDir
-    BS -->|"pull request\nDevOps review + merge"| UatDir
     BS -->|"pull request\nDevOps review + merge"| ProdDir
-    Flux -->|"sync 1m"| repo
+    FluxDev -->|"sync clusters/dev (1m)"| repo
+    FluxProd -->|"sync clusters/prod (1m)"| repo
     DevDir --> DevNS
-    UatDir --> UatNS
     ProdDir --> ProdNS
 ```
 
@@ -50,20 +50,16 @@ sequenceDiagram
     CI->>CI: test, build, scan, sign → ghcr sha-tag
     CI->>Git: commit bump apps/dev (auto)
     Flux->>Git: reconcile → dev updated
-    Dev->>Ops: verified in dev, request promotion (Backstage Update Service, env=uat)
-    Ops->>Git: review + merge PR → uat updated
-    Dev->>Ops: verified in uat, promote to prod (env=prod)
+    Dev->>Ops: verified in dev, request promotion (Backstage Update Service, env=prod)
     Ops->>Git: review + merge PR → prod updated
 ```
 
 ## Layout
 
 ```
-clusters/kind/            # Flux entrypoint (FluxInstance syncs this path)
+clusters/<env>/           # Flux entrypoint per environment cluster
 ├── sources.yaml          # OCIRepository: shared mop Helm chart
-├── apps-dev.yaml         # Kustomization → ./apps/dev
-├── apps-uat.yaml         # Kustomization → ./apps/uat
-└── apps-prod.yaml        # Kustomization → ./apps/prod
+└── apps.yaml             # Kustomization → ./apps/<env>
 
 apps/
 ├── base/<service>/       # Environment-invariant HelmRelease (chart, probes, resources)
@@ -83,16 +79,15 @@ Design notes:
   resources, service ports).
 - **`catalog/`** sits outside every Flux sync path, so Backstage entities are
   never applied to the cluster; Backstage's GitHub provider discovers them.
-- Environments map to namespaces on one Kind cluster today
-  (`checkout-dev/uat/prod`). Moving to real per-env clusters only requires
-  pointing each cluster's FluxInstance at its own `clusters/<name>` path.
+- Each environment is its own Kind cluster running its own Flux
+  (flux-operator + FluxInstance syncing `clusters/<env>`). Backstage and its
+  database live on a separate mgmt cluster.
 
 ## Environments
 
 | Env | Namespace | Update path | ENV | LOG_LEVEL | Replicas |
 |-----|-----------|-------------|-----|-----------|----------|
 | dev | checkout-dev | CI auto-commit on every main build | development | debug | 1 |
-| uat | checkout-uat | Backstage PR + DevOps review | staging | info | 2 |
 | prod | checkout-prod | Backstage PR + DevOps review | production | warn | 2 |
 
 ## Guard rails
