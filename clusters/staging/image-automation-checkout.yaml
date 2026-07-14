@@ -7,7 +7,7 @@
 # NOTE: staging tracks the latest semver release image (`X.Y.Z`, produced by
 # checkout-service CI on `v*` tag pushes). Cut a release by pushing a git tag
 # `vX.Y.Z`; the policy then selects the highest version.
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageRepository
 metadata:
   name: checkout-staging
@@ -16,7 +16,7 @@ spec:
   image: ghcr.io/duynhlab/checkout-service/checkout-service
   interval: 5m
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
   name: checkout-staging
@@ -31,7 +31,7 @@ spec:
     semver:
       range: '>=0.1.0'
 ---
-apiVersion: image.toolkit.fluxcd.io/v1beta1
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
 metadata:
   name: staging
