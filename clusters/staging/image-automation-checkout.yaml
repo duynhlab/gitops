@@ -4,10 +4,9 @@
 # apps/staging/checkout/values-staging.yaml and commits straight to main
 # (staging is the auto-deploy lane — no review).
 #
-# NOTE: the policy sorts numerically on the monotonic run number that
-# checkout-service CI embeds in main builds (tag form `main-<run>-<sha>`).
-# Until CI emits that tag no candidate matches and the current tag is left
-# untouched.
+# NOTE: staging tracks the latest semver release image (`X.Y.Z`, produced by
+# checkout-service CI on `v*` tag pushes). Cut a release by pushing a git tag
+# `vX.Y.Z`; the policy then selects the highest version.
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
@@ -26,11 +25,11 @@ spec:
   imageRepositoryRef:
     name: checkout-staging
   filterTags:
-    pattern: '^main-(?P<ts>[0-9]+)-[a-f0-9]+$'
-    extract: '$ts'
+    pattern: '^(?P<version>[0-9]+\.[0-9]+\.[0-9]+)$'
+    extract: '$version'
   policy:
-    numerical:
-      order: asc
+    semver:
+      range: '>=0.1.0'
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta1
 kind: ImageUpdateAutomation

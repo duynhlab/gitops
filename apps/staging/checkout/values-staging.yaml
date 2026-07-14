@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  tag: sha-a1f6d12 # {"$imagepolicy": "flux-system:checkout-staging:tag"}
+  tag: 0.2.0 # {"$imagepolicy": "flux-system:checkout-staging:tag"}
 
 env:
   - name: SERVICE_NAME
@@ -13,7 +13,7 @@ env:
   - name: PORT
     value: "8080"
   - name: VERSION
-    value: "sha-a1f6d12"
+    value: "0.2.0"
   - name: ENV
     value: "staging"
   - name: LOG_LEVEL
