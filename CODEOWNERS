@@ -1,3 +1,15 @@
-# DevOps/SRE own this repo. Every change — service onboarding, environment
-# updates, promotions — lands as a pull request that requires their review.
-* @duynhne
+# DevOps/SRE own the higher environments only — every PR touching beta or the
+# production regions requires their review. GitHub enforces code-owner review
+# solely on PRs whose changed files match a pattern below.
+#
+# staging is deliberately NOT owned: onboarding a service, the CI image-
+# automation lane, and staging env-var tweaks all touch only apps/staging/**,
+# apps/base/**, clusters/staging/**, service-registry/** and catalog/** — none
+# of which are listed here — so staging self-service merges without a required
+# review. A base-values change reaches production only through an (owned)
+# Enable Environment / prod PR.
+/apps/beta/**       @duynhne
+/apps/prod-us/**    @duynhne
+/apps/prod-eu/**    @duynhne
+/clusters/prod/**   @duynhne
+CODEOWNERS          @duynhne

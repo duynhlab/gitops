@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: checkout
+  namespace: checkout-staging
+  labels:
+    backstage.io/kubernetes-id: checkout
+spec:
+  interval: 5m
+  timeout: 5m
+  releaseName: checkout
+  chartRef:
+    kind: OCIRepository
+    name: mop-chart-oci
+    namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  # Merge order: base first, then the per-env file (later wins). Maps deep-merge
+  # (image.repository from base + image.tag from staging); the env list is taken
+  # wholesale from the per-env values.
+  valuesFrom:
+    - kind: ConfigMap
+      name: checkout-values-base
+      valuesKey: values-base.yaml
+    - kind: ConfigMap
+      name: checkout-values-staging
+      valuesKey: values-staging.yaml

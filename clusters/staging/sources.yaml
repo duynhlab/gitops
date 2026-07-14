@@ -1,4 +1,4 @@
-# Shared Helm chart for all services (same chart the homelab services use).
+# Shared Helm chart for all services (same chart used across environments).
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:

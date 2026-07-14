@@ -1,4 +1,4 @@
-# Shared Helm chart for all services (same chart the homelab services use).
+# Shared Helm chart for all services (same chart used across environments).
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
@@ -9,3 +9,5 @@ spec:
   url: oci://ghcr.io/duynhlab/helm-charts/mop
   ref:
     semver: ">=0.13.0"
+# The beta / prod-us / prod-eu Kustomizations are added here by the Backstage
+# "Enable Environment" template when a service is promoted beyond staging.

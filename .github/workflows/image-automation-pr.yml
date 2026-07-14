@@ -1,0 +1,32 @@
+name: Image automation PR
+
+# Flux image automation for production environments pushes the rewritten image
+# tag to a `flux-image-<env>` branch instead of committing to main. This opens
+# a pull request from that branch so the change is reviewed (CODEOWNERS) before
+# it reaches main.
+on:
+  push:
+    branches:
+      - 'flux-image-**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update PR to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if gh pr view "$BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "PR already open for $BRANCH"
+            exit 0
+          fi
+          gh pr create --repo "$GITHUB_REPOSITORY" \
+            --base main --head "$BRANCH" \
+            --title "ci: image update on ${BRANCH#flux-image-}" \
+            --body "Automated image tag bump from Flux image automation on the \`${BRANCH#flux-image-}\` environment. Requires DevOps/SRE review before it reaches \`main\`."

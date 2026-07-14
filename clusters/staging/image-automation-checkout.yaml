@@ -1,0 +1,59 @@
+# Flux image automation for checkout on staging.
+# ImageRepository scans ghcr; ImagePolicy picks the newest CI tag; the
+# ImageUpdateAutomation rewrites the marked image.tag line in
+# apps/staging/checkout/values-staging.yaml and commits straight to main
+# (staging is the auto-deploy lane — no review).
+#
+# NOTE: the policy sorts numerically on the monotonic run number that
+# checkout-service CI embeds in main builds (tag form `main-<run>-<sha>`).
+# Until CI emits that tag no candidate matches and the current tag is left
+# untouched.
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: checkout-staging
+  namespace: flux-system
+spec:
+  image: ghcr.io/duynhlab/checkout-service/checkout-service
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: checkout-staging
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: checkout-staging
+  filterTags:
+    pattern: '^main-(?P<ts>[0-9]+)-[a-f0-9]+$'
+    extract: '$ts'
+  policy:
+    numerical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta1
+kind: ImageUpdateAutomation
+metadata:
+  name: staging
+  namespace: flux-system
+spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: fluxcdbot
+        email: fluxcdbot@users.noreply.github.com
+      messageTemplate: |
+        ci(checkout): update staging image to {{range .Updated.Images}}{{println .}}{{end}}
+    push:
+      branch: main
+  update:
+    path: ./apps/staging
+    strategy: Setters

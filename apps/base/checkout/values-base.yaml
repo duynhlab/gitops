@@ -1,0 +1,40 @@
+# Environment-invariant Helm values for checkout (mop chart).
+# Every environment's HelmRelease merges this first, then values-<env>.yaml
+# on top (via valuesFrom, later wins). Only things that never differ per
+# environment belong here — image tag, replicas and env vars live per-env.
+name: checkout
+
+image:
+  repository: ghcr.io/duynhlab/checkout-service/checkout-service
+  pullPolicy: IfNotPresent
+
+service:
+  enabled: true
+  type: ClusterIP
+  http:
+    port: 8080
+    containerPort: 8080
+
+resources:
+  requests:
+    memory: "24Mi"
+    cpu: "20m"
+  limits:
+    memory: "64Mi"
+    cpu: "50m"
+
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 5

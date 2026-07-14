@@ -1,0 +1,7 @@
+# Service registry entry — one file per service, written by the Backstage
+# "Onboard New Service" template. Metadata only; which environments are live
+# is derivable from apps/<env>/checkout/ (and shown in the platform overview).
+name: checkout
+repo: duynhlab/checkout-service
+owner: platform-team
+onboarded: "2026-07-08"

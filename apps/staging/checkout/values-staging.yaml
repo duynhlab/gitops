@@ -1,0 +1,50 @@
+# staging — the full per-environment desired state for checkout.
+# The image.tag line carries a Flux image-automation marker: the staging
+# ImageUpdateAutomation rewrites it in place when a newer matching tag is
+# pushed to ghcr (see clusters/staging/image-automation-checkout.yaml).
+replicaCount: 1
+
+image:
+  tag: sha-a1f6d12 # {"$imagepolicy": "flux-system:checkout-staging:tag"}
+
+env:
+  - name: SERVICE_NAME
+    value: "checkout"
+  - name: PORT
+    value: "8080"
+  - name: VERSION
+    value: "sha-a1f6d12"
+  - name: ENV
+    value: "staging"
+  - name: LOG_LEVEL
+    value: "debug"
+  - name: LOG_FORMAT
+    value: "json"
+  - name: TRACING_ENABLED
+    value: "false"
+  - name: OTEL_COLLECTOR_ENDPOINT
+    value: "otel-collector-opentelemetry-collector.monitoring.svc.cluster.local:4318"
+  - name: OTEL_SAMPLE_RATE
+    value: "1.0"
+  - name: OTEL_BATCH_SIZE
+    value: "512"
+  - name: OTEL_SERVICE_NAME
+    value: "checkout"
+  - name: PROFILING_ENABLED
+    value: "false"
+  - name: PYROSCOPE_ENDPOINT
+    value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+  - name: METRICS_ENABLED
+    value: "true"
+  - name: METRICS_PATH
+    value: "/metrics"
+  - name: SHUTDOWN_TIMEOUT
+    value: "10s"
+  - name: READINESS_DRAIN_DELAY
+    value: "5s"
+  # Demonstrates the ExternalSecret → Secret → env wiring (ESO fake store).
+  - name: APP_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: checkout-secrets
+        key: app-secret
