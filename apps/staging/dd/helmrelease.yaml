@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dd
+  namespace: dd-staging
+  labels:
+    backstage.io/kubernetes-id: dd
+spec:
+  interval: 5m
+  timeout: 5m
+  releaseName: dd
+  chartRef:
+    kind: OCIRepository
+    name: mop-chart-oci
+    namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: dd-values-base
+      valuesKey: values-base.yaml
+    - kind: ConfigMap
+      name: dd-values-staging
+      valuesKey: values-staging.yaml

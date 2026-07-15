@@ -1,0 +1,24 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dd
+  description: "A duynhlab platform service"
+  annotations:
+    # Kubernetes tab: match workload labels from the mop chart (all environments)
+    backstage.io/kubernetes-label-selector: app.kubernetes.io/name=dd
+    # Flux tab: match the backstage.io/kubernetes-id label on HelmReleases
+    backstage.io/kubernetes-id: dd
+    github.com/project-slug: duynhlab/dd-service
+  links:
+    - url: https://github.com/duynhlab/dd-service
+      title: Source repository
+    - url: https://github.com/duynhlab/gitops
+      title: GitOps manifests
+  tags:
+    - go
+    - microservice
+spec:
+  type: service
+  lifecycle: production
+  owner: "group:default/platform-team"
+  system: duynhlab-ecommerce

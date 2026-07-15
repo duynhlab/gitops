@@ -1,0 +1,48 @@
+# staging — full per-environment desired state for dd.
+# The image.tag marker lets the staging ImageUpdateAutomation rewrite the tag
+# when a newer matching CI tag is pushed (see clusters/staging).
+replicaCount: 1
+
+image:
+  tag: "1.29.0" # {"$imagepolicy": "flux-system:dd-staging:tag"}
+
+env:
+  - name: SERVICE_NAME
+    value: "dd"
+  - name: PORT
+    value: "8080"
+  - name: VERSION
+    value: "1.29.0"
+  - name: ENV
+    value: "staging"
+  - name: LOG_LEVEL
+    value: "debug"
+  - name: LOG_FORMAT
+    value: "json"
+  - name: TRACING_ENABLED
+    value: "false"
+  - name: OTEL_COLLECTOR_ENDPOINT
+    value: "otel-collector-opentelemetry-collector.monitoring.svc.cluster.local:4318"
+  - name: OTEL_SAMPLE_RATE
+    value: "1.0"
+  - name: OTEL_BATCH_SIZE
+    value: "512"
+  - name: OTEL_SERVICE_NAME
+    value: "dd"
+  - name: PROFILING_ENABLED
+    value: "false"
+  - name: PYROSCOPE_ENDPOINT
+    value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+  - name: METRICS_ENABLED
+    value: "true"
+  - name: METRICS_PATH
+    value: "/metrics"
+  - name: SHUTDOWN_TIMEOUT
+    value: "10s"
+  - name: READINESS_DRAIN_DELAY
+    value: "5s"
+  - name: APP_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: dd-secrets
+        key: app-secret
