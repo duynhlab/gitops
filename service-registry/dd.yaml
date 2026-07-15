@@ -1,0 +1,5 @@
+# Service registry entry (metadata only; live environments are derivable from
+# apps/<env>/dd/). Written by the Onboard template.
+name: dd
+repo: duynhlab/dd-service
+owner: group:default/platform-team

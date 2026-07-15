@@ -1,0 +1,27 @@
+# Flux image automation for dd on staging.
+# Rewrites the marked image.tag in apps/staging/dd/values-staging.yaml
+# and commits to main (staging is the auto-deploy lane). Tracks the latest
+# semver release image (X.Y.Z, built by CI on v* tag pushes).
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: dd-staging
+  namespace: flux-system
+spec:
+  image: nginx
+  interval: 5m
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: dd-staging
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: dd-staging
+  filterTags:
+    pattern: '^(?P<version>[0-9]+\.[0-9]+\.[0-9]+)$'
+    extract: '$version'
+  policy:
+    semver:
+      range: '>=0.1.0'
